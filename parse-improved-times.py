@@ -191,6 +191,7 @@ class ImprovedTimeRecord:
 def parse_swim_pdf_corrected(pdf_path):
     with pdfplumber.open(pdf_path) as pdf:
         data = []
+        swimmers = []
         for page in pdf.pages:
             text = page.extract_text()
             lines = text.split('\n')
@@ -211,6 +212,7 @@ def parse_swim_pdf_corrected(pdf_path):
                     current_age = parts[-2][1:-1]
                     current_gender = parts[-1]
 
+                    swimmers.append(current_name)
                     continue
 
                 # Process swimmer's event data
@@ -243,6 +245,7 @@ def parse_swim_pdf_corrected(pdf_path):
                     data.append(current_improved_time_record.export_properties())
         
         df = pd.DataFrame(data, columns=['Name', 'Age', 'Gender', 'Course', 'Type of Time', 'Distance','Stroke', 'Date', 'Meet', 'Time Dropped','Baseline Time'])
+        print(f"Processed a total of {len(swimmers)} swimmers")
         return df
 
 
