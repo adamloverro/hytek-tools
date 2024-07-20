@@ -1,5 +1,6 @@
 # Use the official Python 3 image as the base image
-from mcr.microsoft.com/devcontainers/python:1-3.12-bullseye
+ARG VARIANT=3.12-bullseye
+from mcr.microsoft.com/vscode/devcontainers/python:${VARIANT}
 
 # Install Python packages
 RUN pip install pandas pdfplumber
