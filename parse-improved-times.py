@@ -322,7 +322,7 @@ for pdf_path in pdf_files:
     # 1. The records have the same name, age, gender, stroke, distance, and baseline_time
     parsed_df.drop_duplicates(subset=['Name', 'Age', 'Gender', 'Stroke', 'Distance', 'Baseline Time'], inplace=True)
     
-    parsed_df = parsed_df[parsed_df['Time Dropped'] != 0]
+
 
     report_df = generate_improved_time_report(parsed_df)
 
