@@ -199,10 +199,19 @@ def parse_swim_pdf_corrected(pdf_path):
             current_age = None
             current_gender = None
             for line in lines:
+
+                # HyTek incorrectly encodes the letter "f"; 
+                line = line.replace("(cid:976)","f")
                 current_improved_time_record = None
 
-                # Skip unnecessary lines
-                if not line.strip() or "Page" in line or "Licensed To:" in line or "Individual Top Times" in line:
+                # Skip Header lines
+                if not line.strip() or \
+                    "HY-TEK's TEAM MANAGER" in line or \
+                    "Individual Top Times" in line or \
+                    ("Show" in line and "Course" in line) or \
+                    "Coach: " in line or \
+                    "P/F/S Time" in line:
+                    print(f"Skip Header Line: {line}")
                     continue
                 
                 # Identify new swimmer with checks for comma and gender
