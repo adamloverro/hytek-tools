@@ -1,0 +1,3 @@
+pandas 
+pdfplumber
+PyPDF2
