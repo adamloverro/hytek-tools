@@ -1,3 +1,5 @@
 pandas 
 pdfplumber
 PyPDF2
+openpyxl
+pytest

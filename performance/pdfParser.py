@@ -3,6 +3,9 @@ import pprint
 import re
 import pandas as pd
 from datetime import datetime as dt
+import os
+import argparse
+import sys
 
 class Person:
     def __init__(self, name, age, gender):
@@ -125,25 +128,117 @@ def calculate_most_improved_per_swimmer(df):
     return pd.DataFrame(swimmers)
 
 
+def run_most_improved(file_path=None):
+    if file_path is None:
+        raise ValueError("Input error: file_path must be provided.")
+    
+    people = parse_pdf(file_path)
+    people_dict = []
+    for person in people:
+        for time in person.times:
+            people_dict.append(person_to_dict(person, time))
+
+    df = pd.DataFrame(people_dict)
+    improved_df = calculate_most_improved_per_swimmer(df)
+
+    return df, improved_df
+
+def write_to_file(df, improved_df, output_folder: str = None, output_file_prefix: str = "most_improved", csv:bool = True, excel: bool = False):
+    """
+    Write the DataFrame(s) to a file in either Excel or CSV format.
+    By default, exports CSV files.
+    """
+    if output_folder is None:
+        raise ValueError("Output error: output_folder must be provided.")
+    if not os.path.exists(output_folder):
+        raise FileNotFoundError(f"Output folder '{output_folder}' does not exist.")
+
+    if excel:
+        output_file = os.path.join(output_folder, f"{output_file_prefix}.xlsx")
+        writer = pd.ExcelWriter(output_file, engine='openpyxl')
+        df.to_excel(writer, index=False, sheet_name='Raw Data')
+        improved_df.to_excel(writer, index=False, sheet_name='Most Improved')
+        writer.close()
+        print("Excel file created successfully.")
+    
+    if csv:
+        raw_data_file = os.path.join(output_folder, f"{output_file_prefix}_raw_data.csv")
+        improved_file = os.path.join(output_folder, f"{output_file_prefix}.csv")
+        df.to_csv(raw_data_file, index=False)
+        improved_df.to_csv(improved_file, index=False)
+        print("CSV files created successfully.")
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="Parse a swim meet PDF and calculate most improved swimmers."
+    )
+    parser.add_argument(
+        "pdf_file",
+        type=str,
+        help="Path to the PDF file to be parsed."
+    )
+    parser.add_argument(
+        "--output-folder",
+        type=str,
+        required=True,
+        help="Folder to write output CSV/Excel files."
+    )
+    parser.add_argument(
+        "--excel",
+        action="store_true",
+        help="Also output results as an Excel (.xlsx) file."
+    )
+    parser.add_argument(
+        "--no-csv",
+        action="store_true",
+        help="Do not output CSV files (CSV is default)."
+    )
+    parser.add_argument(
+        "--prefix",
+        type=str,
+        default="most_improved",
+        help="Prefix for output files (default: most_improved)."
+    )
+
+    args = parser.parse_args()
+
+    try:
+        df, improved_df = run_most_improved(args.pdf_file)
+        write_to_file(
+            df,
+            improved_df,
+            output_folder=args.output_folder,
+            output_file_prefix=args.prefix,
+            csv=not args.no_csv,
+            excel=args.excel
+        )
+    except Exception as e:
+        print(f"Error: {e}", file=sys.stderr)
+        parser.print_help()
+        sys.exit(1)
+
+if __name__ == "__main__":
+    main()
+
 # Usage example
-file_path = '/Users/Charlie.Ruhs/Projects/MostImproved/most-improved-team-manager-20240717.pdf'
-people = parse_pdf(file_path)
-people_dict = []
-for person in people:
-    for time in person.times:
-        people_dict.append(person_to_dict(person, time))
+# file_path = '/Users/Charlie.Ruhs/Projects/MostImproved/most-improved-team-manager-20240717.pdf'
+# people = parse_pdf(file_path)
+# people_dict = []
+# for person in people:
+#     for time in person.times:
+#         people_dict.append(person_to_dict(person, time))
 
-df = pd.DataFrame(people_dict)
-improved_df = calculate_most_improved_per_swimmer(df)
+# df = pd.DataFrame(people_dict)
+# improved_df = calculate_most_improved_per_swimmer(df)
 
-# Specify the Excel writer and file name
-writer = pd.ExcelWriter('/Users/Charlie.Ruhs/Projects/MostImproved/MostImproved.xlsx', engine='openpyxl')
+# # Specify the Excel writer and file name
+# writer = pd.ExcelWriter('/Users/Charlie.Ruhs/Projects/MostImproved/MostImproved.xlsx', engine='openpyxl')
 
-# Write the DataFrame to an Excel file
-df.to_excel(writer, index=False, sheet_name='Raw Data')
-improved_df.to_excel(writer, index=False, sheet_name='Most Improved')
+# # Write the DataFrame to an Excel file
+# df.to_excel(writer, index=False, sheet_name='Raw Data')
+# improved_df.to_excel(writer, index=False, sheet_name='Most Improved')
 
-# Save the Excel file
-writer.close()
+# # Save the Excel file
+# writer.close()
 
-print("Excel file created successfully.")
+# print("Excel file created successfully.")
