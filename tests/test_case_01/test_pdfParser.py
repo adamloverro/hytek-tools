@@ -1,6 +1,5 @@
 import os
 import pandas as pd
-import pytest
 from performance.pdfParser import run_most_improved, write_to_file
 
 def test_pdf_parser():
@@ -9,6 +8,10 @@ def test_pdf_parser():
     input_pdf = os.path.join(current_dir, "test_input", "most-improved-team-manager-20240717.pdf")
     output_folder = os.path.join(current_dir, "test_output")
     output_prefix = "most_improved"
+
+    # Run the script
+    # Ensure output directory exists
+    os.makedirs(output_folder, exist_ok=True)
 
     # Run the script
     df, improved_df = run_most_improved(input_pdf)
@@ -20,7 +23,6 @@ def test_pdf_parser():
         csv=True,
         excel=True
     )
-
     # Define expected output files
     expected_raw_csv = os.path.join(output_folder, f"{output_prefix}_raw_data.csv")
     expected_improved_csv = os.path.join(output_folder, f"{output_prefix}.csv")

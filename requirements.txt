@@ -1,5 +1,5 @@
-pandas 
-pdfplumber
-PyPDF2
-openpyxl
-pytest
+pandas==1.5.3
+pdfplumber==0.10.2
+PyPDF2==3.0.1
+openpyxl==3.1.2
+pytest==7.4.0
