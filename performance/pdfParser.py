@@ -119,7 +119,7 @@ def calculate_most_improved_per_swimmer(df):
             'Gender': gender,
             'Total Time Dropped': total_time_dropped,
             'Fastest Time Dropped': fastest_time_dropped,
-            'Average Time Dropped': average_time_dropped,
+            'Average Percent Time Dropped': average_time_dropped,
             'Total Percent Time Dropped (Divided by 5)': total_percent_time_dropped
         }
 
