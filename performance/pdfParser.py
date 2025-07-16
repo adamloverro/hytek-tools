@@ -107,6 +107,7 @@ def calculate_most_improved_per_swimmer(df):
 
     for name, group in grouped_df:
         age = group['Age'].iloc[0]
+        age_group = group['Age Group'].iloc[0]
         gender = group['Gender'].iloc[0]
         total_time_dropped = group['Change in Time'].sum()
         fastest_time_dropped = group['Change in Time'].min()
@@ -116,6 +117,7 @@ def calculate_most_improved_per_swimmer(df):
         swimmer = {
             'Name': name,
             'Age': age,
+            'Age Group': age_group,
             'Gender': gender,
             'Total Time Dropped': total_time_dropped,
             'Fastest Time Dropped': fastest_time_dropped,
@@ -139,6 +141,15 @@ def run_most_improved(file_path=None):
             people_dict.append(person_to_dict(person, time))
 
     df = pd.DataFrame(people_dict)
+
+    # Convert 'Age' to numeric for calculations and binning
+    df['Age'] = pd.to_numeric(df['Age'])
+
+    # Create subgroups based on age ranges
+    bins = [0, 8, 10, 12, 14, 100]
+    labels = ['8 & Under', '9-10', '11-12', '13-14', '15 & Over']
+    df['Age Group'] = pd.cut(df['Age'], bins=bins, labels=labels, right=True)
+
     improved_df = calculate_most_improved_per_swimmer(df)
 
     return df, improved_df
